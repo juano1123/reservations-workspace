@@ -1,0 +1,102 @@
+# =========================
+# Dependencies
+# =========================
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# =========================
+# Build outputs
+# =========================
+dist/
+build/
+.next/
+out/
+
+# =========================
+# Coverage & Testing
+# =========================
+coverage/
+.nyc_output/
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# =========================
+# Environment files
+# =========================
+.env
+.env.local
+.env.*.local
+
+# =========================
+# Temporary files
+# =========================
+.temp/
+.tmp/
+
+# =========================
+# Runtime data
+# =========================
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+# IDEs
+# =========================
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# =========================
+# OS
+# =========================
+.DS_Store
+
+# =========================
+# Next.js / TypeScript
+# =========================
+next-env.d.ts
+*.tsbuildinfo
+
+# =========================
+# Vercel
+# =========================
+.vercel/
+
+# =========================
+# Certificates
+# =========================
+*.pem
+
+# =========================
+# Diagnostic reports
+# =========================
+report.*.*.*.*.json
+
+**/node_modules
+**/dist
+**/build
+**/.next
+**/coverage

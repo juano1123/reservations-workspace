@@ -1,0 +1,9 @@
+{
+    "name": "reservations",
+    "private": true,
+    "scripts": {
+        "dev:frontend": "pnpm --dir reservations-front dev",
+        "dev:backend": "pnpm --dir reservations-api start:dev",
+        "install:all": "pnpm install -r"
+    }
+}
