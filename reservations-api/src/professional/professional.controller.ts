@@ -10,6 +10,7 @@ import {
 import { ProfessionalService } from './professional.service';
 import { Professional } from 'src/entities/professional.entity';
 import { CreateProfessionalDto } from './dtos/create-professional.dto';
+import { CreateProfessionalUserDto } from './dtos/create-professional-user.dto';
 
 @Controller('professional')
 export class ProfessionalController {
@@ -41,6 +42,13 @@ export class ProfessionalController {
     @Body() input: CreateProfessionalDto,
   ): Promise<Professional> {
     return this.professionalService.create(input);
+  }
+
+  @Post('with-user')
+  public async createWithUser(
+    @Body() input: CreateProfessionalUserDto,
+  ): Promise<Professional> {
+    return this.professionalService.createWithUser(input);
   }
 
   @Put(':id')

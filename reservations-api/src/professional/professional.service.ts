@@ -2,13 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Professional } from 'src/entities/professional.entity';
+import { UserService } from 'src/user/user.service';
+import { UserRoleEnum } from 'src/user/dtos/user-role.enum';
 import { CreateProfessionalDto } from './dtos/create-professional.dto';
+import { CreateProfessionalUserDto } from './dtos/create-professional-user.dto';
+import { hash } from 'src/utils/security';
 
 @Injectable()
 export class ProfessionalService {
   constructor(
     @InjectRepository(Professional)
     private readonly professionalRepository: Repository<Professional>,
+    private readonly userService: UserService,
   ) {}
 
   public async getAll(): Promise<Professional[]> {
@@ -27,6 +32,28 @@ export class ProfessionalService {
 
   public async create(input: CreateProfessionalDto): Promise<Professional> {
     const professional = this.professionalRepository.create(input);
+    return this.professionalRepository.save(professional);
+  }
+
+  public async createWithUser(
+    input: CreateProfessionalUserDto,
+  ): Promise<Professional> {
+    const hashedPassword = await hash(input.password);
+
+    const user = await this.userService.createUser({
+      firstName: input.firstName,
+      lastName: input.lastName,
+      phoneNumber: input.phoneNumber,
+      email: input.email,
+      password: hashedPassword,
+      role: UserRoleEnum.PROFESSIONAL,
+    });
+
+    const professional = this.professionalRepository.create({
+      userId: user.id,
+      businessId: input.businessId,
+    });
+
     return this.professionalRepository.save(professional);
   }
 
