@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Disclosure,
   DisclosureButton,
@@ -28,7 +30,6 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex lg:hidden">
-            {/* Mobile menu button */}
             <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-pink-100">
               <span className="absolute -inset-0.5" />
               <span className="sr-only">Open main menu</span>

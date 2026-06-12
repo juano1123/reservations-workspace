@@ -1,6 +1,7 @@
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToMany, ManyToOne } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { Business } from './business.entity';
+import { Professional } from './professional.entity';
 
 @Entity()
 export class Service extends BaseEntity {
@@ -13,6 +14,9 @@ export class Service extends BaseEntity {
   @Column({ type: 'numeric', nullable: true })
   price?: number;
 
+  @Column({ type: 'int', default: 60 })
+  duration: number;
+
   @Column({ type: 'varchar' })
   businessId: string;
 
@@ -20,4 +24,7 @@ export class Service extends BaseEntity {
     onDelete: 'CASCADE',
   })
   business: Business;
+
+  @ManyToMany(() => Professional, (professional) => professional.services)
+  professionals?: Professional[];
 }

@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:generate": "ts-node src/config/database/migration-tool.ts",
     "migration:run": "pnpm build && pnpm typeorm migration:run -d ./dist/config/database/data.source.js",
-    "db:seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed --configName 'src/config/database/seedConfig.ts'"
+    "migration:reset": "pnpm build && pnpm typeorm schema:drop -d ./dist/config/database/data.source.js && pnpm typeorm migration:run -d ./dist/config/database/data.source.js",
+    "db:seed": "ts-node --compiler-options '{\"module\": \"commonjs\", \"experimentalDecorators\": true, \"emitDecoratorMetadata\": true, \"strictPropertyInitialization\": false}' ./node_modules/typeorm-seeding/dist/cli.js seed --configName 'src/config/database/seedConfig.ts'"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
