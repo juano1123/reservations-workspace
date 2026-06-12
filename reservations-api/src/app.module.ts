@@ -9,6 +9,7 @@ import { ServiceModule } from './service/service.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { BusinessModule } from './business/business.module';
 import { ProfessionalModule } from './professional/professional.module';
+import { ReservationModule } from './reservation/reservation.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ProfessionalModule } from './professional/professional.module';
     ScheduleModule,
     BusinessModule,
     ProfessionalModule,
+    ReservationModule,
   ],
   controllers: [],
   providers: [
