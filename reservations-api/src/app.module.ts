@@ -7,6 +7,8 @@ import options from './config/database/orm';
 import { AuthGuard } from './auth/auth.guard';
 import { ServiceModule } from './service/service.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { BusinessModule } from './business/business.module';
+import { ProfessionalModule } from './professional/professional.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { ScheduleModule } from './schedule/schedule.module';
     AuthModule,
     ServiceModule,
     ScheduleModule,
+    BusinessModule,
+    ProfessionalModule,
   ],
   controllers: [],
   providers: [
