@@ -1,7 +1,7 @@
 export class CreateReservationDto {
   professionalId: string;
   serviceId: string;
-  clientId: string;
+  clientId?: string;
   businessId: string;
   date: Date;
   startTime: string;

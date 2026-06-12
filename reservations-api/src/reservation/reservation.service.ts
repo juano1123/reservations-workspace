@@ -121,6 +121,31 @@ export class ReservationService {
     if (hasConflict) {
       throw new BadRequestException('This time slot is already booked');
     }
+
+    if (dto.clientId) {
+      const clientReservations = await this.reservationRepository.find({
+        where: {
+          clientId: dto.clientId,
+          date: dto.date,
+          status: In([
+            ReservationStatusEnum.PENDING,
+            ReservationStatusEnum.CONFIRMED,
+          ]),
+        },
+      });
+
+      const clientConflict = clientReservations.some((r) => {
+        const existingStart = this.timeToMinutes(r.startTime);
+        const existingEnd = this.timeToMinutes(r.endTime);
+        return startMin < existingEnd && endMin > existingStart;
+      });
+
+      if (clientConflict) {
+        throw new BadRequestException(
+          'You already have a reservation at this time',
+        );
+      }
+    }
   }
 
   async getAll(): Promise<Reservation[]> {
@@ -151,6 +176,32 @@ export class ReservationService {
       where: { professionalId },
       relations: ['client', 'service', 'business'],
       order: { date: 'ASC' },
+    });
+  }
+
+  async getByProfessionalAndDate(
+    professionalId: string,
+    date: Date,
+  ): Promise<Reservation[]> {
+    return this.reservationRepository.find({
+      where: { professionalId, date },
+      relations: ['service'],
+    });
+  }
+
+  async getByClientIdAndDate(
+    clientId: string,
+    date: Date,
+  ): Promise<Reservation[]> {
+    return this.reservationRepository.find({
+      where: {
+        clientId,
+        date,
+        status: In([
+          ReservationStatusEnum.PENDING,
+          ReservationStatusEnum.CONFIRMED,
+        ]),
+      },
     });
   }
 

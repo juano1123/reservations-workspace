@@ -17,17 +17,23 @@ export class ProfessionalService {
   ) {}
 
   public async getAll(): Promise<Professional[]> {
-    return this.professionalRepository.find();
+    return this.professionalRepository.find({ relations: ['user'] });
   }
 
   public async getById(id: string): Promise<Professional> {
-    return this.professionalRepository.findOne({ where: { id } });
+    return this.professionalRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
   }
 
   public async getByBusinessId(
     businessId: string,
   ): Promise<Professional[]> {
-    return this.professionalRepository.find({ where: { businessId } });
+    return this.professionalRepository.find({
+      where: { businessId },
+      relations: ['user', 'services'],
+    });
   }
 
   public async create(input: CreateProfessionalDto): Promise<Professional> {

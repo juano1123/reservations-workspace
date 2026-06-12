@@ -15,7 +15,7 @@ export function Layout({
 }: Props) {
   return (
     <>
-      <div className="w-full min-h-screen bg-[#e7e8e9] text-[#282f3d]">
+      <div className="w-full min-h-screen bg-white text-[#282f3d]">
         {withNavbar && <Navbar />}
         {withNavigation && <Navigation>{children}</Navigation>}
         {!withNavigation && children}

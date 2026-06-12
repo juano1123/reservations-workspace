@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const options = {
   type: 'postgres',
-  port: Number.parseInt(process.env.POSTGRES_PORT),
+  port: Number.parseInt(process.env.POSTGRES_PORT as string),
   host: process.env.POSTGRES_HOST,
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,

@@ -25,16 +25,27 @@ const daysCharacters = [
   { name: "Sábado", shortName: "Sáb", initials: "S" },
 ];
 
-export default function Calendar() {
+interface Props {
+  selectedDate: Date | null;
+  onSelectDate: (date: Date) => void;
+  closedDates?: string[];
+  disabledDates?: string[];
+}
+
+export default function Calendar({
+  selectedDate,
+  onSelectDate,
+  closedDates = [],
+  disabledDates = [],
+}: Props) {
   const today: Date = startOfToday();
-  const [selectedDay, setSelectedDate] = useState<Date>(today);
   const [currentMonth, setCurrentMonth] = useState<string>(
-    format(today, "MMM-yyyy")
+    format(today, "MMM-yyyy"),
   );
   const firstDayCurrentMonth: Date = parse(
     currentMonth,
     "MMM-yyyy",
-    new Date()
+    new Date(),
   );
 
   const newDays: Date[] = eachDayOfInterval({
@@ -52,9 +63,14 @@ export default function Calendar() {
     setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
   };
 
+  const isClosed = (date: Date): boolean => {
+    const key = format(date, "yyyy-MM-dd");
+    return closedDates.includes(key) || disabledDates.includes(key);
+  };
+
   const selectDate = (date: Date): void => {
-    if (isBefore(date, today)) return;
-    setSelectedDate(date);
+    if (isBefore(date, today) || isClosed(date)) return;
+    onSelectDate(date);
   };
 
   const colStartClasses: string[] = [
@@ -67,6 +83,10 @@ export default function Calendar() {
     "col-start-6",
     "col-start-7",
   ];
+
+  const isDayDisabled = (day: Date): boolean => {
+    return isBefore(day, today) || isClosed(day);
+  };
 
   return (
     <section className=" px-3 py-4 rounded-lg">
@@ -103,34 +123,25 @@ export default function Calendar() {
             className={cn(
               dayIdx > 6 && "border-t border-gray-200",
               "py-2",
-              dayIdx === 0 && colStartClasses[getDay(day)]
+              dayIdx === 0 && colStartClasses[getDay(day)],
             )}
           >
             <button
               type="button"
               onClick={() => selectDate(day)}
+              disabled={isDayDisabled(day)}
               className={cn(
-                isEqual(day, selectedDay) && "text-white",
-                !isEqual(day, selectedDay) &&
-                  isToday(day) &&
-                  "text-pink-100 border-2 border-pink-100 rounded-full",
-                !isEqual(day, selectedDay) &&
-                  !isToday(day) &&
-                  isSameMonth(day, firstDayCurrentMonth) &&
-                  "text-pink-100",
-                !isEqual(day, selectedDay) &&
-                  !isToday(day) &&
-                  !isSameMonth(day, firstDayCurrentMonth) &&
-                  "text-gray-400",
-                isEqual(day, selectedDay) &&
-                  isToday(day) &&
-                  "bg-pink-100 text-white",
-                isEqual(day, selectedDay) && !isToday(day) && "bg-pink-100",
-                !isEqual(day, selectedDay) && "hover:bg-gray-200",
-                (isEqual(day, selectedDay) || isToday(day)) && "font-semibold",
-                isBefore(day, today) &&
-                  "cursor-not-allowed text-gray-400 hover:bg-white",
-                "mx-auto flex h-8 w-8 items-center justify-center rounded-full "
+                isDayDisabled(day) && "cursor-not-allowed text-gray-300 line-through",
+                !isDayDisabled(day) && "hover:bg-gray-200",
+                selectedDate && isEqual(day, selectedDate) && isToday(day) && "bg-pink-100 text-white font-semibold",
+                selectedDate && isEqual(day, selectedDate) && !isToday(day) && "bg-pink-100 text-white font-semibold",
+                !selectedDate && isToday(day) && "text-pink-100 border-2 border-pink-100 rounded-full font-semibold",
+                selectedDate && !isEqual(day, selectedDate) && isToday(day) && "text-pink-100 border-2 border-pink-100 rounded-full font-semibold",
+                !isDayDisabled(day) && !isToday(day) && !selectedDate && isSameMonth(day, firstDayCurrentMonth) && "text-pink-100",
+                !isDayDisabled(day) && !isToday(day) && selectedDate && !isEqual(day, selectedDate) && isSameMonth(day, firstDayCurrentMonth) && "text-pink-100",
+                !isSameMonth(day, firstDayCurrentMonth) && isToday(day) && "text-pink-100",
+                !isSameMonth(day, firstDayCurrentMonth) && !isToday(day) && "text-gray-400",
+                "mx-auto flex h-8 w-8 items-center justify-center rounded-full",
               )}
             >
               <time dateTime={format(day, "yyyy-MM-dd")}>

@@ -11,6 +11,7 @@ import { ProfessionalService } from './professional.service';
 import { Professional } from 'src/entities/professional.entity';
 import { CreateProfessionalDto } from './dtos/create-professional.dto';
 import { CreateProfessionalUserDto } from './dtos/create-professional-user.dto';
+import { Public } from 'src/auth/constants';
 
 @Controller('professional')
 export class ProfessionalController {
@@ -30,6 +31,7 @@ export class ProfessionalController {
     return this.professionalService.getById(id);
   }
 
+  @Public()
   @Get('business/:businessId')
   public async getByBusinessId(
     @Param() { businessId }: { businessId: string },

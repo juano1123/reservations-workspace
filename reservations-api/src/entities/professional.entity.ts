@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 import { Business } from './business.entity';
+import { Service } from './service.entity';
 
 @Entity()
 export class Professional extends BaseEntity {
@@ -19,4 +20,8 @@ export class Professional extends BaseEntity {
     onDelete: 'CASCADE',
   })
   business: Business;
+
+  @ManyToMany(() => Service, (service) => service.professionals)
+  @JoinTable({ name: 'professional_services' })
+  services?: Service[];
 }

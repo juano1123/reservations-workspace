@@ -14,16 +14,16 @@ export enum ReservationStatusEnum {
 
 @Entity()
 export class Reservation extends BaseEntity {
-  @Column({ type: 'varchar' })
+  @Column({ type: 'uuid' })
   professionalId: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'uuid' })
   serviceId: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'uuid' })
   clientId: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'uuid' })
   businessId: string;
 
   @Column({ type: 'date' })

@@ -6,13 +6,13 @@ import {
   Param,
   Post,
   Put,
-  Query,
 } from '@nestjs/common';
 import { ReservationService } from './reservation.service';
 import { Reservation } from 'src/entities/reservation.entity';
 import { CreateReservationDto } from './dtos/create-reservation.dto';
 import { UpdateReservationDto } from './dtos/update-reservation.dto';
 import { Public } from 'src/auth/constants';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 @Controller('reservation')
 export class ReservationController {
@@ -51,6 +51,28 @@ export class ReservationController {
   }
 
   @Public()
+  @Get('professional/:professionalId/date/:date')
+  async getByProfessionalAndDate(
+    @Param() { professionalId, date }: { professionalId: string; date: string },
+  ): Promise<Reservation[]> {
+    return this.reservationService.getByProfessionalAndDate(
+      professionalId,
+      new Date(date),
+    );
+  }
+
+  @Public()
+  @Get('client/:clientId/date/:date')
+  async getByClientIdAndDate(
+    @Param() { clientId, date }: { clientId: string; date: string },
+  ): Promise<Reservation[]> {
+    return this.reservationService.getByClientIdAndDate(
+      clientId,
+      new Date(date),
+    );
+  }
+
+  @Public()
   @Get('business/:businessId')
   async getByBusinessId(
     @Param() { businessId }: { businessId: string },
@@ -69,7 +91,11 @@ export class ReservationController {
   @Post()
   async create(
     @Body() input: CreateReservationDto,
+    @CurrentUser() user: { sub: string },
   ): Promise<Reservation> {
+    if (!input.clientId && user?.sub) {
+      input.clientId = user.sub;
+    }
     return this.reservationService.create(input);
   }
 
