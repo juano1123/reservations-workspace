@@ -7,6 +7,7 @@ import { Provider } from "react-redux";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PendingBookingProvider } from "@/contexts/PendingBookingContext";
+import AppShell from "@/components/AppShell";
 
 interface Props {
   children: React.ReactNode;
@@ -17,7 +18,9 @@ export function Providers({ children }: Props) {
     <ThemeProvider attribute="class">
       <Provider store={store}>
         <AuthProvider>
-          <PendingBookingProvider>{children}</PendingBookingProvider>
+          <PendingBookingProvider>
+            <AppShell>{children}</AppShell>
+          </PendingBookingProvider>
         </AuthProvider>
       </Provider>
       <Toaster />

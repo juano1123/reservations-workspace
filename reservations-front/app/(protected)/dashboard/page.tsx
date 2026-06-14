@@ -1,8 +1,7 @@
 "use client";
 
-import { Layout } from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
-import { format } from "date-fns";
+import { authFetch } from "@/utils/authFetch";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -19,7 +18,7 @@ interface Reservation {
 }
 
 export default function Dashboard() {
-  const { user, token, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,11 +33,8 @@ export default function Dashboard() {
     const currentUser = user;
     async function fetchReservations() {
       try {
-        const res = await fetch(
+        const res = await authFetch(
           `${apiUrl}/reservation/client/${currentUser.id}`,
-          {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-          },
         );
         const data = await res.json();
         setReservations(data);
@@ -49,7 +45,7 @@ export default function Dashboard() {
       }
     }
     fetchReservations();
-  }, [apiUrl, user, token, authLoading, router]);
+  }, [apiUrl, user, authLoading, router]);
 
   const formatTime = (time: string) => {
     const [h, m] = time.split(":").map(Number);
@@ -83,7 +79,6 @@ export default function Dashboard() {
   ).length;
 
   return (
-    <Layout withNavigation>
       <div className="p-6">
         <h1 className="text-2xl font-bold text-pink-100 mb-6 font-nunito">
           Mis Reservas
@@ -157,9 +152,7 @@ export default function Dashboard() {
                       <td className="px-6 py-4">
                         {r.professional?.user?.firstName ?? "-"}
                       </td>
-                      <td className="px-6 py-4">
-                        {format(new Date(r.date), "dd/MM/yyyy")}
-                      </td>
+                      <td className="px-6 py-4">{r.date.split("-").reverse().join("/")}</td>
                       <td className="px-6 py-4">
                         {formatTime(r.startTime)} - {formatTime(r.endTime)}
                       </td>
@@ -172,6 +165,5 @@ export default function Dashboard() {
           )}
         </div>
       </div>
-    </Layout>
   );
 }

@@ -1,6 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
+import { RefreshDto } from './dtos/refresh.dto';
 import { RegisterDto } from './dtos/register.dto';
 import { SignInSuccessDto } from './dtos/signInSuccess.dto';
 import { Public } from './constants';
@@ -19,5 +20,13 @@ export class AuthController {
   @Post('register')
   public async register(@Body() input: RegisterDto): Promise<SignInSuccessDto> {
     return await this.authService.register(input);
+  }
+
+  @Public()
+  @Post('refresh')
+  public async refresh(
+    @Body() input: RefreshDto,
+  ): Promise<{ accessToken: string }> {
+    return await this.authService.refreshToken(input);
   }
 }

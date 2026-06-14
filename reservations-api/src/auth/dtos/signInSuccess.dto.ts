@@ -2,6 +2,7 @@ import { UserRoleEnum } from 'src/user/dtos/user-role.enum';
 
 export class SignInSuccessDto {
   accessToken: string;
+  refreshToken: string;
   id: string;
   email: string;
   role: UserRoleEnum;

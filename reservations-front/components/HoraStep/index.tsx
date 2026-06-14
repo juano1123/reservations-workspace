@@ -2,6 +2,7 @@
 
 import { IProfessional, ITimeSlot } from "@/interfaces/IBooking";
 import { IService } from "@/interfaces/IService";
+import { authFetch } from "@/utils/authFetch";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import StepContainer from "../StepContainer";
@@ -63,15 +64,15 @@ const HoraStep = ({
         const dateStr = format(selectedDate, "yyyy-MM-dd");
 
         const fetches: Promise<Response>[] = [
-          fetch(`${apiUrl}/schedule/business/${businessId}`),
-          fetch(
+          authFetch(`${apiUrl}/schedule/business/${businessId}`),
+          authFetch(
             `${apiUrl}/reservation/professional/${selectedProfessional.id}/date/${dateStr}`,
           ),
         ];
 
         if (userId) {
           fetches.push(
-            fetch(`${apiUrl}/reservation/client/${userId}/date/${dateStr}`),
+            authFetch(`${apiUrl}/reservation/client/${userId}/date/${dateStr}`),
           );
         }
 
@@ -191,8 +192,8 @@ const HoraStep = ({
 
   return (
     <StepContainer>
-      <div className="h-full flex flex-1 flex-col items-center">
-        <div className="mt-2 w-full">
+      <div className="flex flex-col items-center">
+        <div className="w-full">
           {!selectedDate || !selectedProfessional ? (
             <p className="text-center text-gray-400 py-8">
               Selecciona una fecha y profesional primero
@@ -202,29 +203,22 @@ const HoraStep = ({
               No hay horarios disponibles para esta fecha
             </p>
           ) : (
-            availableSlots.map((slot, index) => (
-              <div key={`${slot.startTime}_${index}`}>
-                {index > 0 && <hr />}
-                <div
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 p-2">
+              {availableSlots.map((slot, index) => (
+                <button
+                  key={`${slot.startTime}_${index}`}
+                  type="button"
                   onClick={() => onSelectTime(slot)}
-                  className={`flex items-center justify-between w-full m-1.5 p-1.5 rounded-md cursor-pointer ${
+                  className={`flex items-center justify-center rounded-xl py-3 px-4 text-sm font-medium transition-all duration-200 shadow-sm ${
                     selectedTime?.startTime === slot.startTime
-                      ? "bg-pink-100 text-white"
-                      : "hover:bg-gray-50"
+                      ? "bg-pink-100 text-white ring-2 ring-pink-300 shadow-md scale-105"
+                      : "bg-white text-gray-700 border border-gray-200 hover:border-pink-200 hover:shadow-md hover:scale-[1.02]"
                   }`}
                 >
-                  <div
-                    className={`text-sm leading-7 ${
-                      selectedTime?.startTime === slot.startTime
-                        ? "text-white"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                  </div>
-                </div>
-              </div>
-            ))
+                  {formatTime(slot.startTime)}
+                </button>
+              ))}
+            </div>
           )}
         </div>
       </div>

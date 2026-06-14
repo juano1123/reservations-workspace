@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, Raw } from 'typeorm';
 import {
   Reservation,
   ReservationStatusEnum,
@@ -24,7 +24,9 @@ export class ReservationService {
     private readonly scheduleRepository: Repository<Schedule>,
   ) {}
 
-  private getWeekday(date: Date): WeekdayEnum {
+  private getWeekday(dateStr: string): WeekdayEnum {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     const days: WeekdayEnum[] = [
       WeekdayEnum.Sunday,
       WeekdayEnum.Monday,
@@ -45,7 +47,7 @@ export class ReservationService {
   private async validateAvailability(
     dto: CreateReservationDto,
   ): Promise<void> {
-    const weekday = this.getWeekday(new Date(dto.date));
+    const weekday = this.getWeekday(dto.date);
     const startMin = this.timeToMinutes(dto.startTime);
     const endMin = this.timeToMinutes(dto.endTime);
 
@@ -93,8 +95,9 @@ export class ReservationService {
 
     const isClosed = schedule.closedDays?.some(
       (closed) =>
-        new Date(closed.date).toDateString() ===
-        new Date(dto.date).toDateString(),
+        closed.date instanceof Date
+          ? closed.date.toISOString().slice(0, 10) === dto.date
+          : closed.date === dto.date,
     );
 
     if (isClosed) {
@@ -104,7 +107,7 @@ export class ReservationService {
     const existingReservations = await this.reservationRepository.find({
       where: {
         professionalId: dto.professionalId,
-        date: dto.date,
+        date: Raw(() => `date = :date`, { date: dto.date }),
         status: In([
           ReservationStatusEnum.PENDING,
           ReservationStatusEnum.CONFIRMED,
@@ -126,7 +129,7 @@ export class ReservationService {
       const clientReservations = await this.reservationRepository.find({
         where: {
           clientId: dto.clientId,
-          date: dto.date,
+          date: Raw(() => `date = :date`, { date: dto.date }),
           status: In([
             ReservationStatusEnum.PENDING,
             ReservationStatusEnum.CONFIRMED,
@@ -164,7 +167,7 @@ export class ReservationService {
   async getByClientId(clientId: string): Promise<Reservation[]> {
     return this.reservationRepository.find({
       where: { clientId },
-      relations: ['professional', 'service', 'business'],
+      relations: ['professional', 'professional.user', 'service', 'business'],
       order: { date: 'ASC' },
     });
   }
@@ -181,22 +184,22 @@ export class ReservationService {
 
   async getByProfessionalAndDate(
     professionalId: string,
-    date: Date,
+    date: string,
   ): Promise<Reservation[]> {
     return this.reservationRepository.find({
-      where: { professionalId, date },
+      where: { professionalId, date: Raw(() => `date = :date`, { date }) },
       relations: ['service'],
     });
   }
 
   async getByClientIdAndDate(
     clientId: string,
-    date: Date,
+    date: string,
   ): Promise<Reservation[]> {
     return this.reservationRepository.find({
       where: {
         clientId,
-        date,
+        date: Raw(() => `date = :date`, { date }),
         status: In([
           ReservationStatusEnum.PENDING,
           ReservationStatusEnum.CONFIRMED,
@@ -213,9 +216,9 @@ export class ReservationService {
     });
   }
 
-  async getByDate(date: Date): Promise<Reservation[]> {
+  async getByDate(date: string): Promise<Reservation[]> {
     return this.reservationRepository.find({
-      where: { date },
+      where: { date: Raw(() => `date = :date`, { date }) },
       relations: ['professional', 'service', 'client', 'business'],
     });
   }

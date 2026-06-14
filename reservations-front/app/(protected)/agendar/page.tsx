@@ -2,7 +2,6 @@
 
 import FechaStep from "@/components/FechaStep";
 import HoraStep from "@/components/HoraStep";
-import { Layout } from "@/components/Layout";
 import ServicioStep from "@/components/ServicioStep";
 import Button from "@/components/shared/Button";
 import Steps, { Step } from "@/components/Steps";
@@ -60,6 +59,7 @@ export default function Page() {
 
   useEffect(() => {
     setHasPendingBooking(hasBookingData);
+    return () => setHasPendingBooking(false);
   }, [hasBookingData, setHasPendingBooking]);
 
   useEffect(() => {
@@ -157,7 +157,7 @@ export default function Page() {
   };
 
   return (
-    <Layout withNavigation>
+    <>
       <div className="min-h-screen w-full pt-8 lg:pt-24 pb-12 flex flex-col items-center sm:px-3">
         <h2 className="text-3xl tracking-tight text-pink-100 sm:text-4xl font-nunito">
           Agenda
@@ -309,6 +309,6 @@ export default function Page() {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   );
 }

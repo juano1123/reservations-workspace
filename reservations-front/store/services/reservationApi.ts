@@ -1,9 +1,6 @@
 import { IBookingState } from "@/interfaces/IBooking";
-
-function authHeaders(): Record<string, string> {
-  const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
+import { authFetch } from "@/utils/authFetch";
+import { format } from "date-fns";
 
 export async function createReservation(
   booking: IBookingState,
@@ -12,7 +9,7 @@ export async function createReservation(
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const dateStr = booking.date
-    ? new Date(booking.date).toISOString().split("T")[0]
+    ? format(booking.date, "yyyy-MM-dd")
     : "";
 
   const body: Record<string, unknown> = {
@@ -29,11 +26,10 @@ export async function createReservation(
     body.clientId = clientId;
   }
 
-  const res = await fetch(`${apiUrl}/reservation`, {
+  const res = await authFetch(`${apiUrl}/reservation`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...authHeaders(),
     },
     body: JSON.stringify(body),
   });
@@ -49,8 +45,6 @@ export async function createReservation(
 export async function getReservationsByBusiness(): Promise<unknown[]> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const businessId = process.env.NEXT_PUBLIC_BUSINESS_ID;
-  const res = await fetch(`${apiUrl}/reservation/business/${businessId}`, {
-    headers: authHeaders(),
-  });
+  const res = await authFetch(`${apiUrl}/reservation/business/${businessId}`);
   return res.json();
 }

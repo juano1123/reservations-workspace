@@ -63,7 +63,10 @@ export default function Calendar({
     setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
   };
 
+  const closedDaysOfWeekFinal: number[] = [0, 6];
+
   const isClosed = (date: Date): boolean => {
+    if (closedDaysOfWeekFinal.includes(getDay(date))) return true;
     const key = format(date, "yyyy-MM-dd");
     return closedDates.includes(key) || disabledDates.includes(key);
   };
@@ -74,7 +77,6 @@ export default function Calendar({
   };
 
   const colStartClasses: string[] = [
-    "",
     "col-start-1",
     "col-start-2",
     "col-start-3",
@@ -131,18 +133,43 @@ export default function Calendar({
               onClick={() => selectDate(day)}
               disabled={isDayDisabled(day)}
               className={cn(
-                isDayDisabled(day) && "cursor-not-allowed text-gray-300 line-through",
-                !isDayDisabled(day) && "hover:bg-gray-200",
-                selectedDate && isEqual(day, selectedDate) && isToday(day) && "bg-pink-100 text-white font-semibold",
-                selectedDate && isEqual(day, selectedDate) && !isToday(day) && "bg-pink-100 text-white font-semibold",
-                !selectedDate && isToday(day) && "text-pink-100 border-2 border-pink-100 rounded-full font-semibold",
-                selectedDate && !isEqual(day, selectedDate) && isToday(day) && "text-pink-100 border-2 border-pink-100 rounded-full font-semibold",
-                !isDayDisabled(day) && !isToday(day) && !selectedDate && isSameMonth(day, firstDayCurrentMonth) && "text-pink-100",
-                !isDayDisabled(day) && !isToday(day) && selectedDate && !isEqual(day, selectedDate) && isSameMonth(day, firstDayCurrentMonth) && "text-pink-100",
-                !isSameMonth(day, firstDayCurrentMonth) && isToday(day) && "text-pink-100",
-                !isSameMonth(day, firstDayCurrentMonth) && !isToday(day) && "text-gray-400",
-                "mx-auto flex h-8 w-8 items-center justify-center rounded-full",
-              )}
+                 isDayDisabled(day) &&
+                   "cursor-not-allowed opacity-30 line-through",
+                 !isDayDisabled(day) && "hover:bg-gray-200",
+                 selectedDate &&
+                   isEqual(day, selectedDate) &&
+                   isToday(day) &&
+                   "bg-pink-100 text-white font-semibold",
+                 selectedDate &&
+                   isEqual(day, selectedDate) &&
+                   !isToday(day) &&
+                   "bg-pink-100 text-white font-semibold",
+                 !selectedDate &&
+                   isToday(day) &&
+                   "text-pink-100 border-2 border-pink-100 rounded-full font-semibold",
+                 selectedDate &&
+                   !isEqual(day, selectedDate) &&
+                   isToday(day) &&
+                   "text-pink-100 border-2 border-pink-100 rounded-full font-semibold",
+                 !isDayDisabled(day) &&
+                   !isToday(day) &&
+                   !selectedDate &&
+                   isSameMonth(day, firstDayCurrentMonth) &&
+                   "text-pink-100",
+                 !isDayDisabled(day) &&
+                   !isToday(day) &&
+                   selectedDate &&
+                   !isEqual(day, selectedDate) &&
+                   isSameMonth(day, firstDayCurrentMonth) &&
+                   "text-pink-100",
+                 !isSameMonth(day, firstDayCurrentMonth) &&
+                   isToday(day) &&
+                   "text-pink-100",
+                 !isSameMonth(day, firstDayCurrentMonth) &&
+                   !isToday(day) &&
+                   "text-gray-400",
+                 "mx-auto flex h-8 w-8 items-center justify-center rounded-full",
+               )}
             >
               <time dateTime={format(day, "yyyy-MM-dd")}>
                 {format(day, "d")}

@@ -58,6 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       fullName: data.fullName,
     };
     localStorage.setItem("auth_token", data.accessToken);
+    localStorage.setItem("auth_refresh_token", data.refreshToken);
     localStorage.setItem("auth_user", JSON.stringify(userData));
     setToken(data.accessToken);
     setUser(userData);
@@ -82,6 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       fullName: data.fullName,
     };
     localStorage.setItem("auth_token", data.accessToken);
+    localStorage.setItem("auth_refresh_token", data.refreshToken);
     localStorage.setItem("auth_user", JSON.stringify(userData));
     setToken(data.accessToken);
     setUser(userData);
@@ -89,6 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem("auth_token");
+    localStorage.removeItem("auth_refresh_token");
     localStorage.removeItem("auth_user");
     setToken(null);
     setUser(null);

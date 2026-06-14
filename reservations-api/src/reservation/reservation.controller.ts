@@ -57,7 +57,7 @@ export class ReservationController {
   ): Promise<Reservation[]> {
     return this.reservationService.getByProfessionalAndDate(
       professionalId,
-      new Date(date),
+      date,
     );
   }
 
@@ -68,7 +68,7 @@ export class ReservationController {
   ): Promise<Reservation[]> {
     return this.reservationService.getByClientIdAndDate(
       clientId,
-      new Date(date),
+      date,
     );
   }
 
@@ -85,7 +85,7 @@ export class ReservationController {
   async getByDate(
     @Param() { date }: { date: string },
   ): Promise<Reservation[]> {
-    return this.reservationService.getByDate(new Date(date));
+    return this.reservationService.getByDate(date);
   }
 
   @Post()

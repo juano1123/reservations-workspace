@@ -3,7 +3,7 @@ export class CreateReservationDto {
   serviceId: string;
   clientId?: string;
   businessId: string;
-  date: Date;
+  date: string;
   startTime: string;
   endTime: string;
   notes?: string;

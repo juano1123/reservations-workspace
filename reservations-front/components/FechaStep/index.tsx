@@ -2,7 +2,8 @@
 
 import { IProfessional } from "@/interfaces/IBooking";
 import { IService } from "@/interfaces/IService";
-import { addDays, format, startOfDay } from "date-fns";
+import { authFetch } from "@/utils/authFetch";
+import { addDays, format, getDay, startOfDay } from "date-fns";
 import { useEffect, useState } from "react";
 import Calendar from "../Calendar";
 import StepContainer from "../StepContainer";
@@ -28,14 +29,14 @@ interface ReservationSlot {
   endTime: string;
 }
 
-const weekdayMap: Record<string, string> = {
-  Sunday: "Sunday",
-  Monday: "Monday",
-  Tuesday: "Tuesday",
-  Wednesday: "Wednesday",
-  Thursday: "Thursday",
-  Friday: "Friday",
-  Saturday: "Saturday",
+const weekdayMap: Record<string, number> = {
+  Sunday: 0,
+  Monday: 1,
+  Tuesday: 2,
+  Wednesday: 3,
+  Thursday: 4,
+  Friday: 5,
+  Saturday: 6,
 };
 
 const FechaStep = ({
@@ -54,7 +55,7 @@ const FechaStep = ({
   useEffect(() => {
     async function fetchProfessionals() {
       try {
-        const res = await fetch(
+        const res = await authFetch(
           `${apiUrl}/professional/business/${businessId}`,
         );
         const data = await res.json();
@@ -73,27 +74,27 @@ const FechaStep = ({
 
       try {
         const [scheduleRes, reservationRes] = await Promise.all([
-          fetch(`${apiUrl}/schedule/business/${businessId}`),
-          fetch(
+          authFetch(`${apiUrl}/schedule/business/${businessId}`),
+          authFetch(
             `${apiUrl}/reservation/professional/${selectedProfessional.id}`,
           ),
         ]);
 
         const schedules = await scheduleRes.json();
-        const allReservations: ReservationSlot[] =
-          await reservationRes.json();
+        const allReservations: ReservationSlot[] = await reservationRes.json();
 
         if (!schedules.length) return;
 
         const scheduleDays: ScheduleDayData[] = schedules[0].days ?? [];
+
         const closed = (schedules[0].closedDays ?? []).map(
-          (c: { date: string }) =>
-            new Date(c.date).toISOString().split("T")[0],
+          (c: { date: string }) => c.date,
         );
+
         setClosedDates(closed);
 
-        const workingDayNames = new Set(
-          scheduleDays.map((d) => weekdayMap[d.day] || d.day),
+        const workingDayIndices = new Set(
+          scheduleDays.map((d) => weekdayMap[d.day]),
         );
 
         const slotDuration = selectedService?.duration ?? 60;
@@ -109,11 +110,11 @@ const FechaStep = ({
         ) => startA < endB && endA > startB;
 
         const hasAvailableSlots = (date: Date): boolean => {
-          const dayOfWeek = format(date, "EEEE");
-          if (!workingDayNames.has(dayOfWeek)) return false;
+          const dayIdx = getDay(date);
+          if (!workingDayIndices.has(dayIdx)) return false;
 
           const scheduleDay = scheduleDays.find(
-            (d) => (weekdayMap[d.day] || d.day) === dayOfWeek,
+            (d) => weekdayMap[d.day] === dayIdx,
           );
           if (!scheduleDay) return false;
 
@@ -123,10 +124,9 @@ const FechaStep = ({
             scheduleDay.blocks?.filter((b) => b.type === "Break") ?? [];
 
           const dateStr = format(date, "yyyy-MM-dd");
-          const dayReservations = allReservations.filter((r) => {
-            const rDate = new Date(r.date);
-            return format(rDate, "yyyy-MM-dd") === dateStr;
-          });
+          const dayReservations = allReservations.filter(
+            (r) => r.date === dateStr,
+          );
 
           let current = dayStart;
           while (current + slotDuration <= dayEnd) {
@@ -172,7 +172,7 @@ const FechaStep = ({
 
         const today = startOfDay(new Date());
         const disabled: string[] = [];
-        for (let i = 1; i <= 60; i++) {
+        for (let i = 1; i <= 365; i++) {
           const date = addDays(today, i);
           if (!hasAvailableSlots(date)) {
             disabled.push(format(date, "yyyy-MM-dd"));
@@ -229,12 +229,14 @@ const FechaStep = ({
           ))}
         </div>
         <div className="lg:w-2/3">
-          <Calendar
-            selectedDate={selectedDate}
-            onSelectDate={onSelectDate}
-            closedDates={closedDates}
-            disabledDates={disabledDates}
-          />
+          {selectedProfessional && (
+            <Calendar
+              selectedDate={selectedDate}
+              onSelectDate={onSelectDate}
+              closedDates={closedDates}
+              disabledDates={disabledDates}
+            />
+          )}
         </div>
       </div>
     </StepContainer>
